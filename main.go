@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -86,7 +87,7 @@ func cancelExtraWorkflows() {
 	// this cancellation is best effort only
 	for _, id := range allWorkflowIdsToCancel {
 		_, err = client.Actions.CancelWorkflowRunByID(ctx, owner, repo, id)
-		if err != nil {
+		if err != nil && !errors.Is(err, &github.AcceptedError{}) {
 			logger.Warn("unable to cancel run", zap.Int64("id", id), zap.Error(err))
 		}
 	}
